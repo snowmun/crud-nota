@@ -1,0 +1,13 @@
+version: "1.0"
+
+services:
+  mysql-db:
+    image: mysql:latest
+    container_name: mysql-ToDo
+    volumes:
+      - ./db/var:/var/lib/mysql
+    ports:
+      - 3307:3307
+    environment:
+      - MYSQL_ROOT_PASSWORD=securerootpassword
+      - MYSQL_DATABASE=ToDoDB

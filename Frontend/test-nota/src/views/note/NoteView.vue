@@ -13,7 +13,10 @@
     </div>
     <b-tabs>
       <b-tab title="Todas">
-        <b-table striped hover stacked="md" :items="items" v-if="!loading" :fields="fieldsTable">
+        <b-table striped hover stacked="md" :items="noteList" v-if="!loading" :fields="fieldsTable">
+          <template v-slot:cell(contenido)="data">
+            <div>{{ data.value.slice(0, 20) }}{{ data.value.length > 20 ? '...' : '' }}</div>
+          </template>
           <template #cell(action)="row">
             <div>
               <b-button size="sm" variant="warning" class="mx-1 my-1" @click="updateNote(row.item.id)">
@@ -27,13 +30,13 @@
               </b-button>
             </div>
           </template>
-          <template>
-            <div class="text-center text-primary my-2">
-              <b-spinner align="middle"></b-spinner>
-              <strong>Cargando</strong>
-            </div>
-          </template>
         </b-table>
+        <template>
+        <div v-if="loading" class="text-center text-primary my-2 text-warning">
+          <b-spinner align="middle"></b-spinner>
+          <span>Cargando</span>
+        </div>
+      </template>
       </b-tab>
       <b-tab title="Pan"></b-tab>
       <b-tab title="Verdura"></b-tab>
@@ -48,6 +51,8 @@
 
 <script>
 import NoteModalComponent from'@/components/note/NoteModalComponent.vue';
+import noteServices from '@/services/note/noteService'
+
 export default {
   name: 'NoteView',
   components: {
@@ -58,47 +63,55 @@ export default {
       loading: false,
       noteId: null,
       fieldsTable: [
-        {
-          key: 'id',
-          label: 'Id',
-          sortable: false
+        { key: 'index', label: '#', sortable: false },
+        { key: 'titulo', label: 'Titulo', sortable: false },
+        { key: 'contenido', label: 'Contenido', sortable: false},
+        { key: 'nombre_usuario', label: 'Usuario', sortable: false },
+        { key: 'estado', label: 'Estado', sortable: false },
+        { key: 'tipo_emergencia', label: 'Tipo de Emergencia', sortable: false },
+        { key: 'end_date', label: 'Fecha Termino', sortable: false },
+        { key: 'action', label: 'Acciones', sortable: false
         },
-        {
-          key: 'titulo',
-          label: 'Titulo',
-          sortable: false
-        },
-        {
-          key: 'usuario',
-          label: 'Usuario',
-          sortable: false
-        },
-        {
-          key: 'estado',
-          label: 'Estado',
-          sortable: false
-        },
-        {
-          key: 'action',
-          label: 'Acciones',
-          sortable: false
-        },
-        
       ],
-      items: [
-        { id: 40, titulo: 'Dickerson', usuario:'name',estado: 'active' },
-        { id: 21, titulo: 'Larsen', usuario:'name',estado: 'active' },
-        { id: 89, titulo: 'Geneva', usuario:'name',estado: 'inactive' },
-        { id: 38, titulo: 'Jami', usuario:'name',estado: 'active' }
-      ],
+
+      noteList: null,
       search: ''
     }
+  },
+  async mounted() {
+    this.init()
   },
   methods: {
     searchData() {
       // Aquí puedes realizar la búsqueda en la lista de items utilizando el valor de search
       console.log('Search: ', this.search);
     },
+
+    async init(){
+      await this.getNotes()
+    },
+
+    async getNotes(){
+      this.loading = true
+      await noteServices.notesList()
+        .then(({code , data}) => {
+          if (code == 200){
+            // se agrega la propiedad index a cada objeto en notaList
+            this.noteList = data.notas.map((nota, index) => ({...nota, index: index + 1}))
+            this.$toasted.success('vista de la nota cargada')
+
+          }else{
+            this.$toasted.error('Error en el servidor no se pudo cargar la nota')
+          }
+        })
+        .catch(() => {
+          this.$toasted.error('Error al obtener la informacion')
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+
     createNote() {
       this.$router.push({
         name: 'noteform',

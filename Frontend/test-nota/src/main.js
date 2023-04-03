@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import VueToasted from 'vue-toasted'
-
+import VueSwal from 'vue-swal'
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -16,6 +16,8 @@ Vue.use(VueToasted, {
   position: 'top-right',
   duration: 2000
 })
+
+Vue.use(VueSwal)
 
 new Vue({
   router,

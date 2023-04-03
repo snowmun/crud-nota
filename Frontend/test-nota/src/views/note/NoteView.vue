@@ -25,7 +25,7 @@
               <b-button size="sm" variant="secondary" class="mx-1 my-1" @click="openModal(row.item.id)">
                 <b-icon-eye></b-icon-eye> 
               </b-button>
-              <b-button size="sm" variant="danger" class="mx-1 my-1 " >
+              <b-button size="sm" variant="danger" class="mx-1 my-1 " @click="destroy(row.item.id)" >
                 <b-icon-x></b-icon-x>
               </b-button>
             </div>
@@ -52,7 +52,6 @@
 <script>
 import NoteModalComponent from'@/components/note/NoteModalComponent.vue';
 import noteServices from '@/services/note/noteService'
-
 export default {
   name: 'NoteView',
   components: {
@@ -125,6 +124,51 @@ export default {
         params: { id, action: 'update' }
       })
     },
+
+  destroy(id) {
+    this.$swal({
+      title: 'Estás seguro?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showDenyButton: true,
+      buttons: false,
+      buttons: {
+        confirm: {
+          text: 'Si, eliminar',
+          value: true,
+          visible: true,
+          className: 'bg-danger',
+          closeModal: true,
+        },
+        deny: {
+          text: 'No, cancelar',
+          value: false,
+          visible: true,
+          className: 'bg-primary',
+          closeModal: true,
+        },
+      },
+    }).then((result) => {
+      if (result) {
+        noteServices.deleteNoteById(id)
+          .then(({code , data}) => {
+            if (code == 200){
+              this.$toast.success(message)
+            } else {
+              this.$toast.warning('error en el servidor al eliminar ');
+            }
+          })
+          .catch(() => {
+            this.$toast.error('Error al eliminar');
+          })
+          .finally(() => {
+            this.getNotes();
+          });
+      }
+    })
+  },
+
+
     openModal(id) {
       this.noteId = id;
       this.$refs.noteModal.show();

@@ -6,7 +6,6 @@ class Database:
         self.mycursor = None
 
     def connect(self):
-        # Se crea una conexión con la base de datos utilizando las credenciales proporcionadas
         self.mydb = mysql.connector.connect(
             host="localhost",
             user="root",
@@ -22,7 +21,20 @@ class Database:
         else:
             print("Error al conectar a la base de datos")
 
-    def disconnect(self):
+        # Inicia la transacción
+        self.mycursor.execute("START TRANSACTION")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is not None:
+            # Si se produce una excepción, se llama al método rollback para deshacer los cambios
+            self.mydb.rollback()
+            print("Rollback realizado")
+        else:
+            # Si todo está bien, se confirma la transacción
+            self.mydb.commit()
+            print("Transacción confirmada")
+
         if self.mydb.is_connected():
             self.mycursor.close()
             self.mydb.close()
@@ -34,8 +46,11 @@ class Database:
             self.mycursor.execute(sql, params)
         else:
             self.mycursor.execute(sql)
-        
-        return self.mycursor.fetchall()
 
-    def commit(self):
-        self.mydb.commit()
+        return self.mycursor.fetchall()
+    
+    def disconnect(self):
+        if self.mydb.is_connected():
+            self.mycursor.close()
+            self.mydb.close()
+            print("Conexión a la base de datos cerrada")

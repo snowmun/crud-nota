@@ -49,7 +49,7 @@ export default {
     async getNotes(){
       this.loading = true
       await noteServices.notesList()
-        .then(({code , data, detail= null}) => {
+        .then(({code , data}) => {
           if (code == 200){
             // se agrega la propiedad index a cada objeto en notaList
             this.notaList = data.notas.map((nota, index) => ({...nota, index: index + 1}))

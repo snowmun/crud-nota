@@ -8,6 +8,6 @@ class DatoPersonal(BaseModel):
     edad: int
     rut: str
     profesion: str
-    id_comuna: int
     nombre_usuario:str
+    id_comuna: int
     id_dato_personal: Optional[int]

@@ -3,6 +3,9 @@
     <h3 class="text-center">Todas las Notas</h3>
     <div class="table-responsive">
       <b-table striped hover stacked="md" :items="notaList" v-if="!loading" :fields="fieldsTable" class="margin-top__20">
+        <template v-slot:cell(activo)="data">
+            <div>{{ data.value == 1?'Activo':'Inactivo' }}</div>
+          </template>
         <template v-slot:cell(contenido)="data">
           <div>{{ data.value.slice(0, 20) }}{{ data.value.length > 20 ? '...' : '' }}</div>
         </template>

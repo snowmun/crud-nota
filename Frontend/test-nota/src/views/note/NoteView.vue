@@ -13,9 +13,12 @@
     </div>
     <b-tabs>
       <b-tab title="Todas">
-        <b-table striped hover stacked="md" :items="noteList" v-if="!loading" :fields="fieldsTable">
+        <b-table striped hover stacked="md" :items="filteredNoteListByTitle()" v-if="!loading" :fields="fieldsTable">
           <template v-slot:cell(contenido)="data">
             <div>{{ data.value.slice(0, 20) }}{{ data.value.length > 20 ? '...' : '' }}</div>
+          </template>
+          <template v-slot:cell(activo)="data">
+            <div>{{ data.value == 1?'Activo':'Inactivo' }}</div>
           </template>
           <template #cell(action)="row">
             <div>
@@ -38,37 +41,60 @@
         </div>
       </template>
       </b-tab>
-      <b-tab title="Pan"></b-tab>
-      <b-tab title="Verdura"></b-tab>
-      <b-tab title="Comida"></b-tab>
+      <b-tab v-for="(label) in lebelList" :key="label.id" :title="label.nombre">
+        <b-table striped hover stacked="md" :items="filteredNoteList(label.id)" :fields="fieldsTable">
+          <template v-slot:cell(contenido)="data">
+            <div>{{ data.value.slice(0, 20) }}{{ data.value.length > 20 ? '...' : '' }}</div>
+          </template>
+          <template v-slot:cell(activo)="data">
+            <div>{{ data.value == 1?'Activo':'Inactivo' }}</div>
+          </template>
+          <template #cell(action)="row">
+            <div>
+              <b-button size="sm" variant="warning" class="mx-1 my-1" @click="updateNote(row.item.id)">
+                <b-icon-pencil></b-icon-pencil>
+              </b-button>
+              <b-button size="sm" variant="secondary" class="mx-1 my-1" @click="openModal(row.item.id)">
+                <b-icon-eye></b-icon-eye> 
+              </b-button>
+              <b-button size="sm" variant="danger" class="mx-1 my-1 " @click="destroy(row.item.id)" >
+                <b-icon-x></b-icon-x>
+              </b-button>
+            </div>
+          </template>
+        </b-table>
+      </b-tab>
     </b-tabs>
     <b-modal ref="noteModal" @hidden="onModalClose">
       <NoteModalComponent :note-id="noteId"/>
     </b-modal>
-
   </b-card>
 </template>
 
 <script>
-import NoteModalComponent from'@/components/note/NoteModalComponent.vue';
+import NoteModalComponent from'@/components/note/NoteModalComponent.vue'
 import noteServices from '@/services/note/noteService'
+import labelService from '@/services/label/labelService'
+
 export default {
   name: 'NoteView',
   components: {
     NoteModalComponent
   },
+  
   data() {
     return {
       loading: false,
       noteId: null,
+      lebelList: null,
       fieldsTable: [
         { key: 'index', label: '#', sortable: false },
         { key: 'titulo', label: 'Titulo', sortable: false },
         { key: 'contenido', label: 'Contenido', sortable: false},
         { key: 'nombre_usuario', label: 'Usuario', sortable: false },
-        { key: 'estado', label: 'Estado', sortable: false },
+        { key: 'activo', label: 'Estado', sortable: false },
         { key: 'tipo_emergencia', label: 'Tipo de Emergencia', sortable: false },
-        { key: 'end_date', label: 'Fecha Termino', sortable: false },
+        { key: 'fecha_termino', label: 'Fecha Termino', sortable: false },
         { key: 'action', label: 'Acciones', sortable: false
         },
       ],
@@ -80,14 +106,35 @@ export default {
   async mounted() {
     this.init()
   },
+  computed: {
+    filteredNoteList() {
+      return (labelId) => {
+        return this.noteList.filter(note => note.id_etiqueta === labelId)
+      }
+    },
+    filteredNoteListByTitle() {
+        return () => {
+          const search = this.search.trim().toLowerCase();
+          if (!search) {
+            return this.noteList;
+          }
+          return this.noteList.filter(note => note.titulo.toLowerCase().includes(search));
+        }
+      }
+  },
   methods: {
     searchData() {
-      // Aquí puedes realizar la búsqueda en la lista de items utilizando el valor de search
-      console.log('Search: ', this.search);
+      if (!this.search) {
+        // Si no se ingresó ningún término de búsqueda, mostrar todas las notas
+        this.filteredNoteList = this.noteList;
+      } else {
+        // Filtrar las notas por título
+        this.filteredNoteList = this.noteList.filter(note => note.titulo.includes(this.search));
+      }
     },
-
     async init(){
       await this.getNotes()
+      await this.getLabels()
     },
 
     async getNotes(){
@@ -110,7 +157,22 @@ export default {
           this.loading = false;
         });
     },
-
+    async getLabels(){
+      await labelService.labelsList()
+        .then(({code , data}) => {
+          if (code == 200){
+            this.lebelList = data
+          }else{
+            this.$toasted.error('Error en el servidor no se pudo obtener las notas')
+          }
+        })
+        .catch(() => {
+          this.$toasted.error('Error al obtener la informacion')
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
     createNote() {
       this.$router.push({
         name: 'noteform',

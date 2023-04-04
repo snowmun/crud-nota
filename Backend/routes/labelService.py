@@ -34,12 +34,12 @@ def listar_etiqueta(id: int):
         for result in results:
             etiquetas = {
                 "id": result[0],
-                "name": result[1],
+                "nombre": result[1],
             }
             etiqueta.append(etiquetas)
         
         db.disconnect()
-        return {"etiqueta": etiqueta}
+        return etiqueta
     except Exception as e:
         raise e
     finally:

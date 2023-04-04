@@ -7,28 +7,36 @@ const noteServices = {
     return { code: response.status, data };
   },
 
-  async createNote({ titulo, contenido, nombre_usuario, tipo_emergencia, end_date }) {
+  async noteList(id) {
+    const response = await fetch(`${config.urlApi}/api/v1/listar_nota/${id}`);
+    const data = await response.json();
+    return { code: response.status, data };
+  },
+
+  async createNote({ form }) {
     const response = await fetch(`${config.urlApi}/api/v1/crear_nota`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ titulo, contenido, nombre_usuario, tipo_emergencia, end_date })
+      body: JSON.stringify(form)
     });
     const data = await response.json();
     return { code: response.status, data };
   },
 
-  async updateNote({ id, titulo, contenido, nombre_usuario, tipo_emergencia, end_date }) {
-    const response = await fetch(`${config.urlApi}/api/v1/actualizar_nota/${id}`, {
+  async updateNote({ form }) {
+    const response = await fetch(`${config.urlApi}/api/v1/actualizar_nota/${form.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ titulo, contenido, nombre_usuario, tipo_emergencia, end_date })
+      body: JSON.stringify(form)
     });
+  
     const data = await response.json();
     return { code: response.status, data };
+    
   },
 
   async deleteNoteById(id) {
@@ -37,6 +45,7 @@ const noteServices = {
     });
     const data = await response.json();
     return { code: response.status, data };
+
   }
 };
 

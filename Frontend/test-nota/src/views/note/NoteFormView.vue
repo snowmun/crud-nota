@@ -97,139 +97,137 @@ export default {
     this.init();
     },
     methods: {
-        submitForm() {
-        },
-        async init() {
-          this.prepareData()
-          this.getUsers()
-          this.getLabels()
-          this.getType()
-        },
-        prepareData() {
-            const { params } = this.$route
-            if (params && params.action) {
-                const { id, action } = params
-                this.selectedAction = action
-                if (params.action !== 'create') this.getElement(id)
-            }
-        },
-        async getElement(id) {
-          this.loading = true
-          await noteServices.noteList(id)
-            .then(({code , data}) => {
-              if (code == 200){
-                // se agrega la propiedad index a cada objeto en notaList
-                this.form = data.nota[0]
-                this.$toasted.success('Notas cargadas correctamente')
-              }else{
-                this.$toasted.error('Error en el servidor no se pudo obtener las notas')
-              }
-            })
-            .catch(() => {
-              this.$toasted.error('Error al obtener la informacion')
-            })
-            .finally(() => {
-              this.loading = false;
-            });
-        },
-
-        async getUsers(){
-          await userServices.usersList()
-            .then(({code , data}) => {
-              if (code == 200){
-                this.userList = data
-              }else{
-                this.$toasted.error('Error en el servidor no se pudo obtener las notas')
-              }
-            })
-            .catch(() => {
-              this.$toasted.error('Error al obtener la informacion')
-            })
-            .finally(() => {
-              this.loading = false;
-            });
-        },
-        async getLabels(){
-          await labelService.labelsList()
-            .then(({code , data}) => {
-              if (code == 200){
-                this.lebelList = data
-              }else{
-                this.$toasted.error('Error en el servidor no se pudo obtener las notas')
-              }
-            })
-            .catch(() => {
-              this.$toasted.error('Error al obtener la informacion')
-            })
-            .finally(() => {
-              this.loading = false;
-            });
-        },
-        async getType(){
-          await typeService.typeList()
-            .then(({code , data}) => {
-              if (code == 200){
-                this.typeList = data
-              }else{
-                this.$toasted.error('Error en el servidor no se pudo obtener las notas')
-              }
-            })
-            .catch(() => {
-              this.$toasted.error('Error al obtener la informacion')
-            })
-            .finally(() => {
-              this.loading = false;
-            });
-        },
-        
-        async saveNote() {
-          if (this.selectedAction === 'update') {
-            this.loading = true
-            await noteServices.updateNote({ form: this.form })
-              .then(({code}) => {
-                if (code == 200) {
-                  this.$toasted.success('Se actualiza correctamente')
-                  this.back()
-                }
-              })
-              .catch(() => {
-                this.$toasted.error('Error al Actualizar')
-              })
-              .finally(() => {
-                this.loading = false
-              })
-          } else if (this.selectedAction === 'create') {
-            this.loading = true
-            await noteServices.createNote({ form: this.form })
-              .then(({code}) => {
-                if (code == 200) {
-                  this.$toasted.success('Se crea correctamente')
-                  this.back()
-                } else {
-                  this.$toasted.warning(`error del servidor al crear`)
-                }
-              })
-              .catch(() => {
-                this.$toast.error('Error al crear')
-              })
-              .finally(() => {
-                this.loading = false
-              })
+      async init() {
+        this.prepareData()
+        this.getUsers()
+        this.getLabels()
+        this.getType()
+      },
+      prepareData() {
+          const { params } = this.$route
+          if (params && params.action) {
+              const { id, action } = params
+              this.selectedAction = action
+              if (params.action !== 'create') this.getElement(id)
           }
-        },
-        clearForm() {
-            this.form.titulo = null;
-            this.form.contenido = null;
-            this.form.radioValue = null;
-            this.form.fecha = new Date();
-            this.form.usuario = null;
-        },
-        back() {
-            this.$router.push({
-                name: 'note',
+      },
+      async getElement(id) {
+        this.loading = true
+        await noteServices.noteList(id)
+          .then(({code , data}) => {
+            if (code == 200){
+              // se agrega la propiedad index a cada objeto en notaList
+              this.form = data.nota[0]
+              this.$toasted.success('Notas cargadas correctamente')
+            }else{
+              this.$toasted.error('Error en el servidor no se pudo obtener las notas')
+            }
+          })
+          .catch(() => {
+            this.$toasted.error('Error al obtener la informacion')
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      },
+
+      async getUsers(){
+        await userServices.usersList()
+          .then(({code , data}) => {
+            if (code == 200){
+              this.userList = data
+            }else{
+              this.$toasted.error('Error en el servidor no se pudo obtener las notas')
+            }
+          })
+          .catch(() => {
+            this.$toasted.error('Error al obtener la informacion')
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      },
+      async getLabels(){
+        await labelService.labelsList()
+          .then(({code , data}) => {
+            if (code == 200){
+              this.lebelList = data
+            }else{
+              this.$toasted.error('Error en el servidor no se pudo obtener las notas')
+            }
+          })
+          .catch(() => {
+            this.$toasted.error('Error al obtener la informacion')
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      },
+      async getType(){
+        await typeService.typeList()
+          .then(({code , data}) => {
+            if (code == 200){
+              this.typeList = data
+            }else{
+              this.$toasted.error('Error en el servidor no se pudo obtener las notas')
+            }
+          })
+          .catch(() => {
+            this.$toasted.error('Error al obtener la informacion')
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      },
+      
+      async saveNote() {
+        if (this.selectedAction === 'update') {
+          this.loading = true
+          await noteServices.updateNote({ form: this.form })
+            .then(({code}) => {
+              if (code == 200) {
+                this.$toasted.success('Se actualiza correctamente')
+                this.back()
+              }
+            })
+            .catch(() => {
+              this.$toasted.error('Error al Actualizar')
+            })
+            .finally(() => {
+              this.loading = false
+            })
+        } else if (this.selectedAction === 'create') {
+          this.loading = true
+          await noteServices.createNote({ form: this.form })
+            .then(({code}) => {
+              if (code == 200) {
+                this.$toasted.success('Se crea correctamente')
+                this.back()
+              } else {
+                this.$toasted.warning(`error del servidor al crear`)
+              }
+            })
+            .catch(() => {
+              this.$toast.error('Error al crear')
+            })
+            .finally(() => {
+              this.loading = false
             })
         }
-    }
+      },
+      clearForm() {
+          this.form.titulo = null;
+          this.form.contenido = null;
+          this.form.radioValue = null;
+          this.form.fecha = new Date();
+          this.form.usuario = null;
+      },
+      back() {
+          this.$router.push({
+              name: 'note',
+          })
+      }
+  }
 }
   </script>
 <style scoped>

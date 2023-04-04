@@ -213,7 +213,7 @@ export default {
     }).then((result) => {
       if (result) {
         noteServices.deleteNoteById(id)
-          .then(({code , data}) => {
+          .then(({code}) => {
             if (code == 200){
               this.$toast.success(message)
             } else {

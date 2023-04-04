@@ -71,7 +71,38 @@ def listar_nota(id: int):
     finally:
         db.disconnect()
 
-    
+@router.get('/api/v1/listar_nota_usuario/{id}')
+def listar_nota_usuario(id: int):
+    try:
+        db.connect() 
+        query = """SELECT n.*, u.nombre_usuario as nombre_usuario, te.nombre as tipo_emergencia, ne.id_etiqueta as id_etiqueta 
+                   FROM nota n 
+                   INNER JOIN usuario u ON n.id_usuario = u.id
+                   INNER JOIN tipo te ON n.id_tipo = te.id
+                   LEFT JOIN nota_etiqueta ne ON n.id = ne.id_nota 
+                   WHERE n.id_usuario = %s"""
+        results = db.query(query % id)  # realizar una consulta SELECT para obtener la nota con el ID especificado
+        notas = []
+        for result in results:
+            nota = {
+                "id": result[0],
+                "titulo": result[1],
+                "contenido": result[2],
+                "activo": result[3],
+                "fecha_termino": str(result[4]),
+                "id_usuario": result[5],
+                "id_tipo": result[6],
+                "nombre_usuario": result[7],
+                "tipo_emergencia": result[8],
+                "id_etiqueta": result[9]
+            }
+            notas.append(nota)
+        return {"nota": notas}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.disconnect()
+        
     
 @router.put('/api/v1/actualizar_nota/{id}')
 def actualizar_nota(id: int, nota: Nota):

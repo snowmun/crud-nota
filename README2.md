@@ -10,7 +10,7 @@ Installed dependencies in vue:
     -bootstrap: "^5.2.3",
     -bootstrap-vue: "^2.23.1",
 
-Installed dependencies in fastApi:
+Installed dependencies in fastApi (review requirements.txt in Backend):
     -email-validator==1.3.1
     -fastapi==0.82.0
     -mysql==0.0.3

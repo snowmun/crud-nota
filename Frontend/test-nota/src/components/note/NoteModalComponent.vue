@@ -4,9 +4,9 @@
         <b-card-header>{{ noteList.titulo }}</b-card-header>
         <b-card-body>
             <p>Usuario: {{ noteList.nombre_usuario }}</p>
-            <p>Estado: {{ noteList.estado }}</p>
+            <p>Estado: {{ noteList.activo == 1? 'Activo':'Inactivo' }}</p>
             <p>Contenido: {{ noteList.contenido }}</p>
-            <p>Terminar antes de: {{ noteList.end_date }}</p>
+            <p>Terminar antes de: {{ noteList.fecha_termino }}</p>
             <p>Clasificacion: {{ noteList.tipo_emergencia }}</p>
             <!-- aquí puedes mostrar el resto de la información de la nota -->
         </b-card-body>
@@ -41,8 +41,6 @@ export default {
           if (code == 200){
             // se agrega la propiedad index a cada objeto en notaList
             this.noteList = data.nota[0]
-            this.$toasted.success('Notas cargadas correctamente')
-            console.log(this.noteList)
           }else{
             this.$toasted.error('Error en el servidor no se pudo obtener las notas')
           }

@@ -32,7 +32,6 @@
     <b-modal ref="userModal" @hidden="onModalClose">
       <UserModalComponent :user-id="userId"/>
     </b-modal>
-
   </b-card>
 </template>
 

@@ -2,12 +2,9 @@
   <b-card>
     <div class="d-flex justify-content-between align-items-center">
       <b-button variant="primary" class="mb-3 col-sm-auto mx-sm-2 " @click="createNote" >Crear Nota</b-button>
-        <div class="d-flex">
+        <div class="d-flex col-3">
           <b-input-group class="mb-3 ">
             <b-form-input v-model="search" placeholder="Buscar por titulo"/>
-            <b-input-group-append>
-              <b-button @click="searchData" variant="primary">Buscar</b-button>
-            </b-input-group-append>
           </b-input-group>
       </div>
     </div>
@@ -35,14 +32,14 @@
           </template>
         </b-table>
         <template>
-        <div v-if="loading" class="text-center text-primary my-2 text-warning">
-          <b-spinner align="middle"></b-spinner>
-          <span>Cargando</span>
-        </div>
-      </template>
+          <div v-if="loading" class="text-center text-primary my-2 text-warning">
+            <b-spinner align="middle"></b-spinner>
+            <span>Cargando</span>
+          </div>
+        </template>
       </b-tab>
       <b-tab v-for="(label) in lebelList" :key="label.id" :title="label.nombre">
-        <b-table striped hover stacked="md" :items="filteredNoteList(label.id)" :fields="fieldsTable">
+        <b-table striped hover stacked="md" :items="filteredNoteList(label.id)" :fields="fieldsTable" :filter="search">
           <template v-slot:cell(contenido)="data">
             <div>{{ data.value.slice(0, 20) }}{{ data.value.length > 20 ? '...' : '' }}</div>
           </template>
@@ -113,14 +110,14 @@ export default {
       }
     },
     filteredNoteListByTitle() {
-        return () => {
-          const search = this.search.trim().toLowerCase();
-          if (!search) {
-            return this.noteList;
-          }
-          return this.noteList.filter(note => note.titulo.toLowerCase().includes(search));
+      return () => {
+        const search = this.search.trim().toLowerCase();
+        if (!search) {
+          return this.noteList;
         }
+        return this.noteList.filter(note => note.titulo.toLowerCase().includes(search));
       }
+    }
   },
   methods: {
     searchData() {
@@ -187,54 +184,54 @@ export default {
       })
     },
 
-  destroy(id) {
-    this.$swal({
-      title: 'Estás seguro?',
-      text: 'Esta acción no se puede deshacer',
-      icon: 'warning',
-      showDenyButton: true,
-      buttons: false,
-      buttons: {
-        confirm: {
-          text: 'Si, eliminar',
-          value: true,
-          visible: true,
-          className: 'bg-danger',
-          closeModal: true,
+    destroy(id) {
+      this.$swal({
+        title: 'Estás seguro?',
+        text: 'Esta acción no se puede deshacer',
+        icon: 'warning',
+        showDenyButton: true,
+        buttons: false,
+        buttons: {
+          confirm: {
+            text: 'Si, eliminar',
+            value: true,
+            visible: true,
+            className: 'bg-danger',
+            closeModal: true,
+          },
+          deny: {
+            text: 'No, cancelar',
+            value: false,
+            visible: true,
+            className: 'bg-primary',
+            closeModal: true,
+          },
         },
-        deny: {
-          text: 'No, cancelar',
-          value: false,
-          visible: true,
-          className: 'bg-primary',
-          closeModal: true,
-        },
-      },
-    }).then((result) => {
-      if (result) {
-        noteServices.deleteNoteById(id)
-          .then(({code}) => {
-            if (code == 200){
-              this.$toast.success(message)
-            } else {
-              this.$toast.warning('error en el servidor al eliminar ');
-            }
-          })
-          .catch(() => {
-            this.$toast.error('Error al eliminar');
-          })
-          .finally(() => {
-            this.getNotes();
-          });
-      }
-    })
-  },
-
+      }).then((result) => {
+        if (result) {
+          noteServices.deleteNoteById(id)
+            .then(({code}) => {
+              if (code == 200){
+                this.$toast.success(message)
+              } else {
+                this.$toast.warning('error en el servidor al eliminar ');
+              }
+            })
+            .catch(() => {
+              this.$toast.error('Error al eliminar');
+            })
+            .finally(() => {
+              this.getNotes();
+            });
+        }
+      })
+    },
 
     openModal(id) {
       this.noteId = id;
       this.$refs.noteModal.show();
     },
+    
     onModalClose() {
         this.noteId = null;
     }

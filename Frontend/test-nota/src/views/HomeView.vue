@@ -19,6 +19,7 @@
 
 <script>
 import noteServices from '@/services/note/noteService'
+import '@/assets/css/general.css';
 
 export default {
   name: 'HomeView',
@@ -70,14 +71,3 @@ export default {
 };
 </script>
 
-<style scoped>
-.custom-button {
-  border: 1px solid #dee2e6;
-  border-radius: 5px;
-  padding: 0.5rem 1rem;
-}
-
-.table-responsive {
-  overflow-x: auto;
-}
-</style>

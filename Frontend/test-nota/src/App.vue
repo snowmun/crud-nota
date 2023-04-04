@@ -10,25 +10,9 @@
   </div>
 </template>
 
-<style scoped>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
+<script>
+import '@/assets/css/app.css';
+export default {
+  name: 'App',
 }
-
-nav {
-  padding: 30px;
-  text-align: center;
-
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-  text-decoration: none;
-}
-
-nav a.router-link-exact-active {
-  color: #ffae00;
-}
-</style>
+</script>

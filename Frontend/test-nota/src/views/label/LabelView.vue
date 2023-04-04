@@ -16,10 +16,10 @@
       </template>
     </b-table>
     <template>
-        <div v-if="loading" class="text-center text-primary my-2 text-warning">
-          <b-spinner align="middle"></b-spinner>
-          <span>Cargando</span>
-        </div>
+      <div v-if="loading" class="text-center text-primary my-2 text-warning">
+        <b-spinner align="middle"></b-spinner>
+        <span>Cargando</span>
+      </div>
     </template>
   </b-card>
 </template>
@@ -53,9 +53,11 @@ export default {
       ],
     }
   },
-  async mounted() {
+
+  mounted() {
     this.init()
   },
+
   methods: {
 
     async init() {

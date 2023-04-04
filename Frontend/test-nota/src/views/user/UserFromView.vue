@@ -1,67 +1,68 @@
 <template>
-    <b-container class="mt-5">
-      <b-row justify="center">
-        <b-col sm="12" md="8">
-          <b-card>
-            <h3 v-if="selectedAction == 'create'" justify="center">Crear Nota</h3>
-            <h3 v-else>Editar Usuario</h3>
-            <b-form @submit.prevent="save" v-if="show">
-              <b-form-group label="Nombre" class="mr-3">
-                <b-form-input v-model="form.nombre" placeholder="Ingrese su nombre" />
-              </b-form-group>
-              <b-form-group label="Apellido" class="mr-3">
-                <b-form-input v-model="form.apellido" placeholder="Ingrese su apellido" />
-              </b-form-group>
-              <b-form-group label="Nombre de Usuario" class="mr-3">
-                <b-form-input v-model="form.nombre_usuario" placeholder="Ingrese su nombre de usuario" />
-              </b-form-group>
-              <b-form-group label="Edad" class="mr-3">
-                <b-form-input type="number" v-model="form.edad" placeholder="Ingrese su edad" />
-              </b-form-group>
-              <b-form-group label="RUT" class="mr-3">
-                <b-form-input v-model="form.rut" placeholder="Ingrese su RUT" />
-              </b-form-group>
-              <b-form-group label="Email" class="mr-3">
-                <b-form-input v-model="form.email" placeholder="Ingrese su email" />
-              </b-form-group>
-              <b-form-group label="Profesión" class="mr-3">
-                <b-form-input v-model="form.profesion" placeholder="Ingrese su profesión" />
-              </b-form-group>
-              <b-form-group label="Región">
-                <b-form-select v-model="form.id_region" :options="regionList" value-field="id" text-field="nombre" placeholder="Seleccione una región" class="custom-select" @change="getComunas">
-                  <template #first>
-                    <b-form-select-option :value="null" disabled>Seleccione una región</b-form-select-option>
-                  </template>
-                </b-form-select>
-              </b-form-group>
-              <b-form-group label="Comuna" >
-                <b-form-select v-model="form.id_comuna"  :options="communeList" value-field="id" text-field="nombre" placeholder="Seleccione una comuna" class="custom-select">
-                  <template #first>
-                    <b-form-select-option :value="null" disabled>Seleccione una comuna</b-form-select-option>
-                  </template>
-                </b-form-select>
-              </b-form-group>
-              <b-row>
-                <b-col>
-                  <b-button type="submit" variant="success" class="mt-3 btn-guardar">
-                    <b-spinner small v-if="loading"></b-spinner>
-                    <span v-else>Guardar</span>
-                  </b-button>
-                  <b-button variant="warning" class="mt-3 btn-limpiar" @click="clearForm">Limpiar</b-button>
-                  <b-button variant="danger" @click="() => back()" class="mt-3 ">Cancelar</b-button>
-                </b-col>
-              </b-row>
-            </b-form>
-          </b-card>
-        </b-col>
-      </b-row>
-    </b-container>
-  </template>
+  <b-container class="mt-5">
+    <b-row justify="center">
+      <b-col sm="12" md="8">
+        <b-card>
+          <h3 v-if="selectedAction == 'create'" justify="center">Crear Nota</h3>
+          <h3 v-else>Editar Usuario</h3>
+          <b-form @submit.prevent="save" v-if="show">
+            <b-form-group label="Nombre" class="mr-3">
+              <b-form-input v-model="form.nombre" placeholder="Ingrese su nombre" />
+            </b-form-group>
+            <b-form-group label="Apellido" class="mr-3">
+              <b-form-input v-model="form.apellido" placeholder="Ingrese su apellido" />
+            </b-form-group>
+            <b-form-group label="Nombre de Usuario" class="mr-3">
+              <b-form-input v-model="form.nombre_usuario" placeholder="Ingrese su nombre de usuario" />
+            </b-form-group>
+            <b-form-group label="Edad" class="mr-3">
+              <b-form-input type="number" v-model="form.edad" placeholder="Ingrese su edad" />
+            </b-form-group>
+            <b-form-group label="RUT" class="mr-3">
+              <b-form-input v-model="form.rut" placeholder="Ingrese su RUT" />
+            </b-form-group>
+            <b-form-group label="Email" class="mr-3">
+              <b-form-input v-model="form.email" placeholder="Ingrese su email" />
+            </b-form-group>
+            <b-form-group label="Profesión" class="mr-3">
+              <b-form-input v-model="form.profesion" placeholder="Ingrese su profesión" />
+            </b-form-group>
+            <b-form-group label="Región">
+              <b-form-select v-model="form.id_region" :options="regionList" value-field="id" text-field="nombre" placeholder="Seleccione una región" class="custom-select" @change="getComunas">
+                <template #first>
+                  <b-form-select-option :value="null" disabled>Seleccione una región</b-form-select-option>
+                </template>
+              </b-form-select>
+            </b-form-group>
+            <b-form-group label="Comuna" >
+              <b-form-select v-model="form.id_comuna"  :options="communeList" value-field="id" text-field="nombre" placeholder="Seleccione una comuna" class="custom-select">
+                <template #first>
+                  <b-form-select-option :value="null" disabled>Seleccione una comuna</b-form-select-option>
+                </template>
+              </b-form-select>
+            </b-form-group>
+            <b-row>
+              <b-col>
+                <b-button type="submit" variant="success" class="mt-3 btn-guardar">
+                  <b-spinner small v-if="loading"></b-spinner>
+                  <span v-else>Guardar</span>
+                </b-button>
+                <b-button variant="warning" class="mt-3 btn-limpiar" @click="clearForm">Limpiar</b-button>
+                <b-button variant="danger" @click="() => back()" class="mt-3 ">Cancelar</b-button>
+              </b-col>
+            </b-row>
+          </b-form>
+        </b-card>
+      </b-col>
+    </b-row>
+  </b-container>
+</template>
 
 <script>
 import userServices from '@/services/user/userService'
 import regionServices from '@/services/region/regionService'
 import comunneServices from '@/services/commune/communeService'
+import '@/assets/css/general.css';
 
 export default {
   name: 'userForm',
@@ -196,32 +197,23 @@ export default {
         this.loading = false;
       });
     },
-
     
     clearForm() {
-        this.form.nombre = null;
-        this.form.apellido = null;
-        this.form.edad = null;
-        this.form.rut = null;
-        this.form.email = null;
-        this.form.profesion = null;
-        this.form.id_region = null;
-        this.form.id_comuna = null;
+      this.form.nombre = null;
+      this.form.apellido = null;
+      this.form.edad = null;
+      this.form.rut = null;
+      this.form.email = null;
+      this.form.profesion = null;
+      this.form.id_region = null;
+      this.form.id_comuna = null;
     },
+    
     back() {
-        this.$router.push({
-            name: 'user',
-        })
+      this.$router.push({
+          name: 'user',
+      })
     },
   },
 };
 </script>
-<style scoped>
-    .btn-guardar{
-        margin-right: 1rem;
-    }
-    .btn-limpiar{
-        margin-right: 1rem;
-    }
-
-</style>

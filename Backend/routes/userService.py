@@ -1,7 +1,9 @@
 from fastapi import APIRouter
 from models.datoPersonalModel import DatoPersonal
 from provider.db import Database
-from script.validateRut import validar_rut
+from script.validaciones import validar_rut
+from script.validaciones import rut_existe
+from script.validaciones import usuario_existe
 
 router = APIRouter()
 db = Database()  # instanciar el objeto de base de datos
@@ -11,9 +13,11 @@ def listar_usuarios():
     try:
         db.connect()  
         results = db.query("""
-            SELECT u.id, u.nombre_usuario, dp.nombre, dp.apellido, dp.email, dp.edad, dp.rut, dp.profesion, dp.id_comuna
+            SELECT u.id, u.nombre_usuario, dp.nombre, dp.apellido, dp.email, dp.edad, dp.rut, dp.profesion, c.nombre AS nombre_comuna, r.nombre AS nombre_region
             FROM usuario u
-            JOIN dato_personal dp ON u.id_dato_personal = dp.id """) 
+            JOIN dato_personal dp ON u.id_dato_personal = dp.id
+            JOIN comuna c ON dp.id_comuna = c.id
+            JOIN region r ON c.id_region = r.id """) 
         usuarios = []
         for result in results:
             usuario = {
@@ -25,7 +29,8 @@ def listar_usuarios():
                 "edad": result[5],
                 "rut": result[6],
                 "profesion": result[7],
-                "id_comuna": result[8],
+                "nombre_comuna": result[8],
+                "nombre_region": result[9]
             }
             usuarios.append(usuario)
         db.disconnect() 
@@ -34,16 +39,19 @@ def listar_usuarios():
         db.disconnect()
         return {"mensaje": f"Error al listar los usuarios: {str(e)}"}
 
+
 @router.get('/api/v1/listar_usuario/{id}')
 def listar_usuario(id: int):
     try:
         db.connect() 
         cursor = db.mycursor
         cursor.execute("""
-            SELECT u.id, u.nombre_usuario, dp.nombre, dp.apellido, dp.email, dp.edad, dp.rut, dp.profesion, dp.id_comuna, c.id_region
+            SELECT u.id, u.nombre_usuario, dp.nombre, dp.apellido, dp.email, dp.edad, dp.rut, dp.profesion, dp.id_comuna, c.id_region,
+            c.nombre AS nombre_comuna, r.nombre AS nombre_region
             FROM usuario u
             JOIN dato_personal dp ON u.id_dato_personal = dp.id
             JOIN comuna c ON dp.id_comuna = c.id
+            JOIN region r ON c.id_region = r.id
             WHERE u.id = %s """, (id,))
         usuarios = []
         for result in cursor:
@@ -57,7 +65,9 @@ def listar_usuario(id: int):
                 "rut": result[6],
                 "profesion": result[7],
                 "id_comuna": result[8],
-                "id_region": result[9]
+                "id_region": result[9],
+                "nombre_comuna": result[10],
+                "nombre_region": result[11]
             }
             usuarios.append(usuario)
         db.disconnect() 
@@ -70,6 +80,15 @@ def listar_usuario(id: int):
 def actualizar_usuario(id: int, usuario: DatoPersonal):
     db.connect() 
     try:
+        if not validar_rut(usuario.rut):
+            return {"error": "El RUT ingresado no es válido"}
+        
+        if rut_existe(usuario.rut, id):
+            return {"error": f"El RUT '{usuario.rut}' ya está en uso por otro usuario y no se puede actualizar"}
+        
+        if usuario_existe(usuario.nombre_usuario, id):
+            return {"error": f"El nombre de usuario '{usuario.nombre_usuario}' ya está en uso y no se puede crear el usuario"}
+
         db.mycursor.execute("""
             UPDATE usuario u 
             JOIN dato_personal dp ON u.id_dato_personal = dp.id
@@ -99,27 +118,21 @@ def actualizar_usuario(id: int, usuario: DatoPersonal):
         return {"mensaje": "Usuario actualizado correctamente"}
     except Exception as e:
         db.mydb.rollback()  
-        return {"mensaje": f"Error al actualizar el usuario: {str(e)}"}
+        return {"error": f"Error al actualizar el usuario: {str(e)}"}
+
 
 @router.post('/api/v1/crear_usuario')
 def crear_usuario(usuario: DatoPersonal):
     db.connect()
     try:
-        # Validar el RUT antes de guardar los datos
         if not validar_rut(usuario.rut):
-            return {"mensaje": "El RUT ingresado no es válido"}
+            return {"error": "El RUT ingresado no es válido"}
         
-        # Verificar si ya existe un usuario con el mismo RUT
-        db.mycursor.execute("SELECT COUNT(*) FROM dato_personal WHERE rut = %s ", (usuario.rut,))
-        result = db.mycursor.fetchone()
-        if result[0] > 0:
-            return {"mensaje": "Ya existe un usuario con el mismo RUT"}
+        if rut_existe(usuario.rut, id= 0):
+            return {"error": f"El RUT '{usuario.rut}' ya está en uso por otro usuario y no se puede actualizar"}
         
-        # Verificar si el nombre de usuario ya existe 
-        db.mycursor.execute("SELECT COUNT(*) FROM usuario WHERE nombre_usuario = %s ", (usuario.nombre_usuario,))
-        result = db.mycursor.fetchone()
-        if result[0] > 0:
-            return {"mensaje": f"El nombre de usuario '{usuario.nombre_usuario}' ya está en uso y no se puede crear el usuario"}
+        if usuario_existe(usuario.nombre_usuario, id= 0):
+            return {"error": f"El nombre de usuario '{usuario.nombre_usuario}' ya está en uso y no se puede crear el usuario"}
         
         # Crear el usuario
         db.mycursor.execute("INSERT INTO dato_personal (nombre, apellido, email, edad, rut, profesion, id_comuna) VALUES (%s, %s, %s, %s, %s, %s, %s)",
@@ -130,7 +143,7 @@ def crear_usuario(usuario: DatoPersonal):
         return {"mensaje": "Usuario creado correctamente"}
     except Exception as e:
         db.mydb.rollback() 
-        return {"mensaje": f"Error al crear el usuario: {str(e)}"}
+        return {"error": f"Error al crear el usuario: {str(e)}"}
 
 @router.delete('/api/v1/eliminar_usuario/{id}')
 def eliminar_usuario(id: int):

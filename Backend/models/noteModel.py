@@ -6,6 +6,6 @@ class Nota(BaseModel):
     contenido: str
     activo: bool
     fecha_termino: str
-    id_usuario: Optional[str]
+    id_usuario: Optional[int]
     id_tipo: int
-    etiqueta:  Optional[int]
+    id_etiqueta:  Optional[int]

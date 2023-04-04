@@ -7,6 +7,7 @@ from routes.labelNoteService import router as labelNoteService
 from routes.typeService import router as typeService
 from routes.communeService import router as communeService
 from routes.regionService import router as regionService
+from routes.loginService import router as loginService
 
 app = FastAPI()
 
@@ -34,6 +35,4 @@ app.include_router(labelNoteService)
 app.include_router(typeService)
 app.include_router(communeService)
 app.include_router(regionService)
-
-
-
+app.include_router(loginService)

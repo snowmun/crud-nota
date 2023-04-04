@@ -16,10 +16,10 @@ def listar_etiquetas():
         for result in results:
             etiquetas = {
                 "id": result[0],
-                "name": result[1],
+                "nombre": result[1],
             }
             etiqueta.append(etiquetas)
-        return {"etiquetas": etiqueta}
+        return etiqueta
     except Exception as e:
         raise e
     finally:

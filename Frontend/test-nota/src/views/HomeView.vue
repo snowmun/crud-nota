@@ -31,9 +31,9 @@ export default {
         { key: 'titulo', label: 'Titulo', sortable: false },
         { key: 'contenido', label: 'Contenido', sortable: false},
         { key: 'nombre_usuario', label: 'Usuario', sortable: false },
-        { key: 'estado', label: 'Estado', sortable: false },
+        { key: 'activo', label: 'Estado', sortable: false },
         { key: 'tipo_emergencia', label: 'Tipo de Emergencia', sortable: false },
-        { key: 'end_date', label: 'Fecha Termino', sortable: false },
+        { key: 'fecha_termino', label: 'Fecha Termino', sortable: false },
       ],
     }
   },

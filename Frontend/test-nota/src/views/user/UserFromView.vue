@@ -19,7 +19,7 @@
               <b-form-input type="number" v-model="form.edad" placeholder="Ingrese su edad" />
             </b-form-group>
             <b-form-group label="RUT" class="mr-3">
-              <b-form-input v-model="form.rut" placeholder="Ingrese su RUT" />
+              <b-form-input v-model="form.rut" placeholder="ingrese su rut con guion y sin puntos" />
             </b-form-group>
             <b-form-group label="Email" class="mr-3">
               <b-form-input v-model="form.email" placeholder="Ingrese su email" />

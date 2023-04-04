@@ -51,6 +51,24 @@ const routes = [
     component: function () {
       return import(/* webpackChunkName: "userform" */ '../views/user/UserFromView.vue')
     }
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: function () {
+      return import(/* webpackChunkName: "login" */ '../views/user/LoginView.vue')
+    }
+  },
+  {
+    path: '/note_user',
+    name: 'noteUser',
+    component: function () {
+      return import(/* webpackChunkName: "noteUser" */ '../views/user/NoteUserView.vue')
+    }
+  },
+  {
+    path: '*',
+    component: () => import('@/views/error/NotFound.vue')
   }
 ]
 

@@ -87,7 +87,7 @@ export default {
           titulo: null,
           contenido: null,
           activo : null,
-          fecha_termino: new Date(),
+          fecha_termino: null,
           id_usuario: null,
           id_etiqueta:null,
           id_tipo: null

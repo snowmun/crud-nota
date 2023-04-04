@@ -35,8 +35,18 @@ CREATE TABLE `nota` (
   KEY `id_tipo_idx` (`id_tipo`),
   CONSTRAINT `id_tipo` FOREIGN KEY (`id_tipo`) REFERENCES `tipo` (`id`),
   CONSTRAINT `id_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `nota`
+--
+
+LOCK TABLES `nota` WRITE;
+/*!40000 ALTER TABLE `nota` DISABLE KEYS */;
+INSERT INTO `nota` VALUES (34,'trabajo servicio','debes crear un servicio para consumirlo por react',1,'2023-04-07',7,7),(35,'trabajo se servicio back','debes  crear los controllers para las consultas a la base de datos',1,'2023-04-05',7,8),(36,'formatear pc','se debe instalar windows a computador nuevo, tambien se le debe instalar office',1,'2023-04-19',7,6),(37,'archivo ERS','se debe crear un informe ERS del nuevo proyecto\"casa mil\"',1,'2023-04-05',7,9);
+/*!40000 ALTER TABLE `nota` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -47,4 +57,4 @@ CREATE TABLE `nota` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-04-04  9:12:17
+-- Dump completed on 2023-04-04 12:14:56

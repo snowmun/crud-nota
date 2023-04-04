@@ -31,8 +31,18 @@ CREATE TABLE `nota_etiqueta` (
   KEY `id_etiqueta_idx` (`id_etiqueta`),
   CONSTRAINT `id_etiqueta` FOREIGN KEY (`id_etiqueta`) REFERENCES `etiqueta` (`id`),
   CONSTRAINT `id_nota` FOREIGN KEY (`id_nota`) REFERENCES `nota` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `nota_etiqueta`
+--
+
+LOCK TABLES `nota_etiqueta` WRITE;
+/*!40000 ALTER TABLE `nota_etiqueta` DISABLE KEYS */;
+INSERT INTO `nota_etiqueta` VALUES (20,34,8),(22,36,7),(23,37,10),(24,35,9);
+/*!40000 ALTER TABLE `nota_etiqueta` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -43,4 +53,4 @@ CREATE TABLE `nota_etiqueta` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-04-04  9:12:17
+-- Dump completed on 2023-04-04 12:14:56

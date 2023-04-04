@@ -35,8 +35,18 @@ CREATE TABLE `dato_personal` (
   UNIQUE KEY `rut_UNIQUE` (`rut`),
   KEY `id_comuna_idx` (`id_comuna`),
   CONSTRAINT `id_comuna` FOREIGN KEY (`id_comuna`) REFERENCES `comuna` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `dato_personal`
+--
+
+LOCK TABLES `dato_personal` WRITE;
+/*!40000 ALTER TABLE `dato_personal` DISABLE KEYS */;
+INSERT INTO `dato_personal` VALUES (7,'orlando','muñoz','17790074-5','31','programador','or.munozf@gmail.com',70);
+/*!40000 ALTER TABLE `dato_personal` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -47,4 +57,4 @@ CREATE TABLE `dato_personal` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-04-04  9:12:18
+-- Dump completed on 2023-04-04 12:14:56

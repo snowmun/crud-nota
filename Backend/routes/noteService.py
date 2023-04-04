@@ -10,7 +10,13 @@ db = Database()  # instanciar el objeto de base de datos
 def listar_notas():
     try:
         db.connect()  # conectarse a la base de datos
-        results = db.query("SELECT * FROM nota")  # realizar una consulta SELECT para obtener todas las notas
+        query = """ SELECT n.*, u.nombre_usuario as nombre_usuario, te.nombre as tipo_emergencia, ne.id_etiqueta 
+                    FROM nota n 
+                    INNER JOIN usuario u ON n.id_usuario = u.id
+                    INNER JOIN tipo te ON n.id_tipo = te.id 
+                    INNER JOIN nota_etiqueta ne ON n.id = ne.id_nota
+                    ORDER BY n.fecha_termino ASC"""
+        results = db.query(query)  # realizar una consulta SELECT para obtener todas las notas con el nombre de usuario
         notas = []
         for result in results:
             # crear un diccionario para cada nota y agregarlo a la lista de notas
@@ -18,27 +24,32 @@ def listar_notas():
                 "id": result[0],
                 "titulo": result[1],
                 "contenido": result[2],
-                "nota_activa": result[3],
-                "plazo_maximo": str(result[4]),
+                "activo":result[3],
+                "fecha_termino": str(result[4]),
                 "id_usuario": result[5],
-                "categoria_id": result[6]
+                "id_tipo": result[6],
+                "nombre_usuario": result[7],
+                "tipo_emergencia": result[8],
+                "id_etiqueta": result[9]
             }
             notas.append(nota)
         
         return {"notas": notas}
-            
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.disconnect()  # cerrar la conexión a la base de datos
-    
 
 
 @router.get('/api/v1/listar_nota/{id}')
 def listar_nota(id: int):
     try:
         db.connect() 
-        results = db.query("SELECT * FROM nota WHERE id = %s" % id)  # realizar una consulta SELECT para obtener la nota con el ID especificado
+        query = """SELECT n.*, u.nombre_usuario as nombre_usuario, te.nombre as tipo_emergencia, ne.id_etiqueta as id_etiqueta 
+                   FROM nota n 
+                   INNER JOIN usuario u ON n.id_usuario = u.id
+                   INNER JOIN tipo te ON n.id_tipo = te.id
+                   LEFT JOIN nota_etiqueta ne ON n.id = ne.id_nota 
+                   WHERE n.id = %s"""
+        results = db.query(query % id)  # realizar una consulta SELECT para obtener la nota con el ID especificado
         notas = []
         for result in results:
             nota = {
@@ -48,7 +59,10 @@ def listar_nota(id: int):
                 "activo": result[3],
                 "fecha_termino": str(result[4]),
                 "id_usuario": result[5],
-                "id_tipo": result[6]
+                "id_tipo": result[6],
+                "nombre_usuario": result[7],
+                "tipo_emergencia": result[8],
+                "id_etiqueta": result[9]
             }
             notas.append(nota)
         return {"nota": notas}
@@ -56,23 +70,37 @@ def listar_nota(id: int):
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.disconnect()
+
     
     
 @router.put('/api/v1/actualizar_nota/{id}')
 def actualizar_nota(id: int, nota: Nota):
     try:
         db.connect() 
-        db.mycursor.execute("UPDATE nota SET titulo = %s, contenido = %s, activo = %s, fecha_termino = %s, id_usuario = %s, id_tipo = %s WHERE id = %s", 
-                   (nota.titulo, nota.contenido, nota.activo, nota.fecha_termino, nota.id_usuario, nota.id_tipo, id))  # realizar una consulta UPDATE para actualizar la nota con el ID especificado
-        db.mydb.commit()  # confirmar los cambios en la base de datos
-        return {"mensaje": "Nota actualizada correctamente"}
+        db.mycursor.execute("SELECT COUNT(*) FROM nota WHERE id = %s", (id,))
+        count = db.mycursor.fetchone()[0]
+        if count == 1:
+            db.mycursor.execute("UPDATE nota SET titulo = %s, contenido = %s, activo = %s, fecha_termino = %s, id_usuario = %s, id_tipo = %s WHERE id = %s", 
+                       (nota.titulo, nota.contenido, nota.activo, nota.fecha_termino, nota.id_usuario, nota.id_tipo, id))
+            if nota.id_etiqueta:
+                # actualizar la etiqueta de la nota
+                db.mycursor.execute("DELETE FROM nota_etiqueta WHERE id_nota = %s", (id,))
+                db.mycursor.execute("INSERT INTO nota_etiqueta (id_nota, id_etiqueta) VALUES (%s, %s)", (id, nota.id_etiqueta))
+            else:
+                # eliminar cualquier etiqueta asociada previamente con la nota
+                db.mycursor.execute("DELETE FROM nota_etiqueta WHERE id_nota = %s", (id,))
+            db.mydb.commit()  # confirmar los cambios en la base de datos
+            return {"mensaje": "Nota actualizada correctamente"}
+                
+        else:
+            return {"mensaje": "La nota con el id especificado no existe"}
     except Exception as e:
         db.mydb.rollback()
         raise e
     finally:
         db.disconnect()
-    
 
+        
 @router.get('/api/v1/nota_etiqueta/{id}')
 def listar_etiqueta(id: int):
     try:
@@ -110,9 +138,9 @@ def crear_nota(nota: Nota):
         db.mycursor.execute("INSERT INTO nota (titulo, contenido, activo, fecha_termino, id_usuario, id_tipo) VALUES (%s, %s, %s, %s, %s, %s)",
                             (nota.titulo, nota.contenido, nota.activo, nota.fecha_termino, nota.id_usuario, nota.id_tipo))
         nota_id = db.mycursor.lastrowid
-        if nota.etiqueta:
+        if nota.id_etiqueta:
             # Si la nota tiene una etiqueta, se agrega un registro a la tabla nota_etiqueta
-            db.mycursor.execute("INSERT INTO nota_etiqueta (id_nota, id_etiqueta) VALUES (%s, %s)", (nota_id, nota.etiqueta))
+            db.mycursor.execute("INSERT INTO nota_etiqueta (id_nota, id_etiqueta) VALUES (%s, %s)", (nota_id, nota.id_etiqueta))
         db.mydb.commit()
         return {"mensaje": "Nota creada correctamente"}
     except Exception as e:

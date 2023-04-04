@@ -4,7 +4,7 @@
       <b-button variant="primary" class="mb-3 col-sm-auto mx-sm-2 " @click="createUser" >Crear Usuario</b-button>
       <div class="d-flex col-3">
         <b-input-group class="mb-3 ">
-          <b-form-input v-model="search" placeholder="Buscar por nombre de usuario"/>
+          <b-form-input v-model="search" placeholder="ingrese alguna palabra o frase para buscar"/>
         </b-input-group>
       </div>
     </div>

@@ -12,6 +12,9 @@
               <b-form-group label="Apellido" class="mr-3">
                 <b-form-input v-model="form.apellido" placeholder="Ingrese su apellido" />
               </b-form-group>
+              <b-form-group label="Nombre de Usuario" class="mr-3">
+                <b-form-input v-model="form.nombre_usuario" placeholder="Ingrese su nombre de usuario" />
+              </b-form-group>
               <b-form-group label="Edad" class="mr-3">
                 <b-form-input type="number" v-model="form.edad" placeholder="Ingrese su edad" />
               </b-form-group>
@@ -25,14 +28,14 @@
                 <b-form-input v-model="form.profesion" placeholder="Ingrese su profesión" />
               </b-form-group>
               <b-form-group label="Región">
-                <b-form-select v-model="form.region" :options="regiones" value-field="id" text-field="nombre" placeholder="Seleccione una región" class="custom-select" @change="getComunas">
+                <b-form-select v-model="form.id_region" :options="regionList" value-field="id" text-field="nombre" placeholder="Seleccione una región" class="custom-select" @change="getComunas">
                   <template #first>
                     <b-form-select-option :value="null" disabled>Seleccione una región</b-form-select-option>
                   </template>
                 </b-form-select>
               </b-form-group>
               <b-form-group label="Comuna" >
-                <b-form-select v-model="form.comuna"  :options="comunas" value-field="id" text-field="nombre" placeholder="Seleccione una comuna" class="custom-select">
+                <b-form-select v-model="form.id_comuna"  :options="communeList" value-field="id" text-field="nombre" placeholder="Seleccione una comuna" class="custom-select">
                   <template #first>
                     <b-form-select-option :value="null" disabled>Seleccione una comuna</b-form-select-option>
                   </template>
@@ -56,139 +59,169 @@
   </template>
 
 <script>
+import userServices from '@/services/user/userService'
+import regionServices from '@/services/region/regionService'
+import comunneServices from '@/services/commune/communeService'
+
 export default {
-    name: 'userForm',
-    data() {
-        return {
-            loading: false,
-            show: true,
-            selectedAction: null,
-            form: {
-                nombre: null,
-                apellido: null,
-                edad: null,
-                rut: null,
-                email: null,
-                profesion: null,
-                region: null,
-                comuna: null,
-            },
-            regiones: [],
-            comunas: [],
-        };
+  name: 'userForm',
+  data() {
+      return {
+          loading: false,
+          show: true,
+          selectedAction: null,
+          userList: null,
+          form: {
+              nombre: null,
+              apellido: null,
+              nombre_usuario: null,
+              edad: null,
+              rut: null,
+              email: null,
+              profesion: null,
+              id_region: null,
+              id_comuna: null,
+          },
+          regionList: [],
+          communeList: [],
+      };
+  },
+  created() {
+      this.getRegiones();
+  },
+  mounted() {
+      this.init();
+  },
+  methods: {
+    init() {
+      this.prepareData()
     },
-    created() {
-        this.getRegiones();
+    prepareData() {
+          const { params } = this.$route
+          if (params && params.action) {
+              const { id, action } = params
+              this.selectedAction = action
+              if (params.action !== 'create') this.getElement(id)
+          }
     },
-    mounted() {
-        this.init();
+    async getElement(id) {
+      this.loading = true
+      await userServices.userList(id)
+      .then(({code , data}) => {
+        if (code == 200){
+          this.form = data[0]
+          this.getComunas()
+        }else{
+          this.$toasted.error('Error en el servidor no se pudo obtener las notas')
+        }
+      })
+      .catch(() => {
+        this.$toasted.error('Error al obtener la informacion')
+      })
+      .finally(() => {
+        this.loading = false;
+      });
     },
-    methods: {
-        init() {
-        this.prepareData()
-        },
-        prepareData() {
-            const { params } = this.$route
-            if (params && params.action) {
-                const { id, action } = params
-                this.selectedAction = action
-                if (params.action !== 'create') this.getElement(id)
+    async save(event) {
+      event.preventDefault()
+      if (this.selectedAction === 'update') {
+        this.loading = true
+        await userServices.updateUser({ form: this.form })
+          .then(({ code, data }) => {
+            console.log(code==200 && !data.error)
+            if (code==200 && !data.error) {
+              this.$toasted.success('Se actualiza correctamente')
+              this.back()
+            } else {
+              this.$toasted.error(`No se pudo actualizar: ${data.error}`)
             }
-        },
-        async getElement(notaId) {
-            console.log(notaId)
-            // this.loading = true
-            // hacer peticion para obtener el elemento
-            // await this.getArea({ id: AreaId })
-                // .then(() => {
-                // this.form = this.selectedArea
-                // })
-                // .catch((error) => {
-                // console.error({ error })
-                // })
-                // .finally(() => {
-                // this.loading = false
-                // })
-        },
-        save(event) {
-        event.preventDefault()
-        //   hacer peticion fetch para editar o crear
-        //   if (this.form.name.length > 0) {
-            // if (this.selectedAction === 'update') {
-            //   this.loading = true
-            //   this.updateArea({ form: this.form })
-            //     .then(({ error, errors }) => {
-            //       if (!error) {
-            //         this.$toast.success('Se actualiza correctamente')
-            //         this.back()
-            //       } else {
-            //         const mensaje = errors[0].message
-            //         this.$toast.warning(`Error Al Actualizar: ${mensaje}`)
-            //       }
-            //     })
-            //     .catch(() => {
-            //       this.$toast.error('Error al Actualizar')
-            //     })
-            //     .finally(() => {
-            //       this.loading = false
-            //     })
-            // } else if (this.selectedAction === 'create') {
-            //   this.loading = true
-            //   this.createArea({ form: this.form })
-            //     .then(({ error, errors }) => {
-            //       if (!error) {
-            //         this.$toast.success('Se crea correctamente')
-            //         this.back()
-            //       } else {
-            //         const mensaje = errors[0].message
-            //         this.$toast.warning(`Error Al crear: ${mensaje}`)
-            //       }
-            //     })
-            //     .catch(() => {
-            //       this.$toast.error('Error al crear')
-            //     })
-            //     .finally(() => {
-            //       this.loading = false
-            //     })
-            // }
-        //   } else {
-        //     this.$toast.warning('Debe ingresar un nombre de Área')
-        //     this.loading = false
-        //   }
-        },
-        async getRegiones() {
-            try {
-                const response = await fetch('https://apis.digital.gob.cl/dpa/regiones');
-                const data = await response.json();
-                this.regiones = data;
-            } catch (error) {
-                console.error(error);
+          })
+          .catch(() => {
+            this.$toasted.error('Error al Actualizar')
+          })
+          .finally(() => {
+            this.loading = false
+          })
+      } else if (this.selectedAction === 'create') {
+        this.loading = true
+        await userServices.createUser({ form: this.form })
+          .then(({ code, data }) => {
+            console.log(code==200 && !data.error)
+            if (code==200 && !data.error) {
+              this.$toasted.success('Se actualiza correctamente')
+              this.back()
+            } else {
+              this.$toasted.error(`No se pudo actualizar: ${data.error}`)
             }
-        },
-        async getComunas() {
-            try {
-                const response = await fetch(`https://apis.digital.gob.cl/dpa/regiones/${this.form.region.id}/comunas`);
-                const data = await response.json();
-                this.comunas = data;
-            } catch (error) {
-                console.error(error);
-            }
-        },
-        clearForm() {
-            this.form.nombre = null;
-            this.form.apellido = null;
-            this.form.edad = null;
-            this.form.rut = null;
-            this.form.email = null;
-            this.form.profesion = null;
-            this.form.region = null;
-            this.form.comuna = null;
-        },
-        back() {
-            this.$router.push({
-                name: 'user',
-            })
-        },
+          })
+          .catch(() => {
+            this.$toasted.error('Error al Actualizar')
+          })
+          .finally(() => {
+            this.loading = false
+          })
+      }
     },
+    async getRegiones() {
+      this.loading = true
+      await regionServices.regionsList()
+      .then(({code , data}) => {
+        if (code == 200){
+          this.regionList = data
+        }else{
+          this.$toasted.error('Error en el servidor no se pudo obtener las notas')
+        }
+      })
+      .catch(() => {
+        this.$toasted.error('Error al obtener la informacion')
+      })
+      .finally(() => {
+        this.loading = false;
+      });
+    },
+    async getComunas() {
+      this.loading = true
+      await comunneServices.comuneList(this.form.id_region)
+      .then(({code , data}) => {
+        if (code == 200){
+          this.communeList = data
+        }else{
+          this.$toasted.error('Error en el servidor no se pudo obtener las notas')
+        }
+      })
+      .catch(() => {
+        this.$toasted.error('Error al obtener la informacion')
+      })
+      .finally(() => {
+        this.loading = false;
+      });
+    },
+
+    
+    clearForm() {
+        this.form.nombre = null;
+        this.form.apellido = null;
+        this.form.edad = null;
+        this.form.rut = null;
+        this.form.email = null;
+        this.form.profesion = null;
+        this.form.id_region = null;
+        this.form.id_comuna = null;
+    },
+    back() {
+        this.$router.push({
+            name: 'user',
+        })
+    },
+  },
 };
 </script>
+<style scoped>
+    .btn-guardar{
+        margin-right: 1rem;
+    }
+    .btn-limpiar{
+        margin-right: 1rem;
+    }
+
+</style>
